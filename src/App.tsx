@@ -1,12 +1,17 @@
 
 
 import './App.css'
+import  Canvan from './assets/components/Canvas.tsx'
 
 function App() {
   
 
   return (
     <>
+    <header>
+      <p>Head</p>
+    </header>
+    <section className='main'>
      <section className='side'>
       <p>One</p>
       <p>Two</p>
@@ -14,10 +19,11 @@ function App() {
       <p>Four</p>
      </section>
 
-     <section className='main'>
-      <div>Head</div>
+     <section className='content'>
+      
       <p>MAIN</p>
-      <p>1</p>
+      <Canvan />
+     </section>
      </section>
     </>
   )

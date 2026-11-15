@@ -1,17 +1,36 @@
+
+.main{
+  display: flex;
+  flex-direction: row;
+  height: 95svh;
+}
+
+
+
+
+
 .side{
-  background-color: red;
+  border: 2px solid red;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
   width: 20em;
 }
 
-.main{
+
+
+
+
+.content{
   padding: 0;
-  background-color: var(--accent-border);
+  border: 2px solid var(--accent-border);
   width: 100%;
 
-  & > div{
-    height: 50px;
-    background-color: aqua;
-  }
+
+}
+
+canvas {
+  border: 1px solid var(--border);
+  background-color: var(--text);
+  align-self: center;
+  justify-self: center;
 }
