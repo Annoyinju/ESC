@@ -1,31 +1,37 @@
 
-
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import './App.css'
-import  Canvan from './assets/components/Canvas.tsx'
+import  CanvasEditor from './assets/components/CanvasEditor.tsx'
+import Explore from './assets/components/Explore.tsx';
 
 function App() {
   
 
   return (
-    <>
+    <BrowserRouter>
     <header>
       <p>Head</p>
     </header>
     <section className='main'>
      <section className='side'>
-      <p>One</p>
-      <p>Two</p>
-      <p>Three</p>
-      <p>Four</p>
+      <nav>
+        <Link to="/">Home</Link>
+        <Link to="/explore">Explore</Link>
+        <Link to="/canvas">Create</Link>
+      </nav>
+      
      </section>
 
      <section className='content'>
-      
-      <p>MAIN</p>
-      <Canvan />
+      <Routes>
+        <Route path="/" element={<CanvasEditor />} />
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/canvas" element={<CanvasEditor />} />
+      </Routes>
+
      </section>
      </section>
-    </>
+    </BrowserRouter>
   )
 }
 
