@@ -281,9 +281,9 @@ function SetupWindow({height, width, onSubmit, setHeight, setWidth}: SetupProps)
                 
 
                 <label htmlFor="inHeight">Height: </label>
-                <input type="number" name="inHeight" value={height} onChange={(e) => {setHeight!(e.target.valueAsNumber)}} id="inHeight" min="1" max="4096"/>
+                <input type="number" name="inHeight" value={height} onChange={(e) => {setHeight!(e.target.valueAsNumber <= Number(e.target.max) || Number.isNaN(e.target.valueAsNumber) ? e.target.valueAsNumber : Number(e.target.max))}} id="inHeight" min="1" max="4096"/>
                 <label htmlFor="inWidth"> Width: </label>
-                <input type="number" name="inWidth" value={width} onChange={(e) => {setWidth!(e.target.valueAsNumber)}} id="inWidth" min="1" max="4096"/>
+                <input type="number" name="inWidth" value={width} onChange={(e) => {setWidth!((e.target.valueAsNumber <= Number(e.target.max) || Number.isNaN(e.target.valueAsNumber)) ? e.target.valueAsNumber : Number(e.target.max))}} id="inWidth" min="1" max="4096"/>
                 <br />
                 <button onClick={onSubmit}>Submit</button>
             </section>
@@ -396,6 +396,9 @@ export default function CanvasEditor(){
             onChange={handleFile}
             style={{ display: "none" }}
             />
+
+
+            <input type="number" name="" id="" onChange={(e) => {console.log(e.target.valueAsNumber)}} />
 
             
             {popstate ? <SetupWindow height={height} width={width} onSubmit={() => {setDimension(true); setPopstate(false)}} setHeight={setHeight} setWidth={setWidth}/> :

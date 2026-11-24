@@ -1,5 +1,5 @@
 
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, HashRouter } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import './App.css'
 import  CanvasEditor from './assets/components/CanvasEditor.tsx'
@@ -24,7 +24,7 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
+    <HashRouter>
     <header>
       {user ? (
       <>
@@ -61,7 +61,7 @@ function App() {
 
      </section>
      </section>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
