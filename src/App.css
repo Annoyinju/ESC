@@ -120,3 +120,26 @@ canvas {
 .resizePanel button {
     grid-column: 1 / -1;
 }
+
+.popupBackdrop {
+    position: fixed;
+    inset: 0;                 /* top/right/bottom/left: 0 */
+    z-index: 1000;            /* above the canvas, menus and header */
+    display: flex;
+    align-items: center;      /* vertical centering */
+    justify-content: center;  /* horizontal centering */
+    background: rgba(0, 0, 0, 0.45);
+}
+
+/* The window itself */
+.popup {
+    position: relative;       /* cancels any old "position: absolute" on .popup */
+    margin: 0;
+    width: min(360px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+    background: var(--bg);
+    border: 1px solid #888;
+    border-radius: 8px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
