@@ -97,14 +97,16 @@ export default function LoginWindow({ onSuccess, onCancel }: LoginWindowProps) {
                     
                                         
                 </div>
-
-                <GoogleLogin
+                <div className="googleSlot">
+                    <span className="orDivider">or</span>
+                    <GoogleLogin
                         onSuccess={(r) => r.credential && googleSignIn(r.credential)}
                         onError={() => setError("Google sign-in failed")}
-                        theme="outline"
-                        size="small"
+                        theme="filled_black"
                         shape="pill"
-                        />
+                        width={280}
+                    />
+                </div>
 
                 {error && <p style={{ color: "#c0392b", margin: "0 16px 10px" }}>{error}</p>}
 
