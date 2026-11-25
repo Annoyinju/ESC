@@ -91,7 +91,8 @@ canvas {
 }
 
 .downloadMenu,
-.resizeMenu {
+.resizeMenu,
+.shareMenu {
     position: relative;
     display: inline-block;
 }
@@ -107,7 +108,7 @@ canvas {
     align-items: center;
     min-width: 200px;
     padding: 10px;
-    background: rgba(255, 255, 255, 0);
+    background: var(--bg);
     
     border: 1px solid var(--accent-border);
 }
@@ -123,17 +124,17 @@ canvas {
 
 .popupBackdrop {
     position: fixed;
-    inset: 0;                 /* top/right/bottom/left: 0 */
-    z-index: 1000;            /* above the canvas, menus and header */
+    inset: 0;                 
+    z-index: 1000;            
     display: flex;
-    align-items: center;      /* vertical centering */
-    justify-content: center;  /* horizontal centering */
+    align-items: center;      
+    justify-content: center;  
     background: rgba(0, 0, 0, 0.45);
 }
 
-/* The window itself */
+
 .popup {
-    position: relative;       /* cancels any old "position: absolute" on .popup */
+    position: relative;       
     margin: 0;
     width: min(360px, calc(100vw - 32px));
     max-height: calc(100vh - 32px);
@@ -142,4 +143,71 @@ canvas {
     border: 1px solid var(--accent-border);
     border-radius: 8px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.exploreScroll {
+    height: 75vh;          
+    overflow-y: auto;
+}
+
+.exploreCard {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    color: #222;
+    box-sizing: border-box;
+}
+
+.exploreImage {
+    flex: 1;              
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+}
+
+.exploreImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.exploreMissing {
+    color: #888;
+    font-size: 13px;
+}
+
+.exploreInfo {
+    height: 56px;          /* must match INFO_HEIGHT in the component */
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    border-top: 1px solid #eee;
+    box-sizing: border-box;
+}
+
+.exploreInfo strong,
+.exploreInfo span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.exploreInfo span {
+    font-size: 13px;
+    color: #666;
+}
+
+.exploreStatus {
+    padding: 16px;
+    text-align: center;
+    color: #666;
 }

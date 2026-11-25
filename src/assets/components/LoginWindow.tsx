@@ -96,7 +96,10 @@ export default function LoginWindow({ onSuccess, onCancel }: LoginWindowProps) {
 
                     <GoogleLogin
                         onSuccess={(r) => r.credential && googleSignIn(r.credential)}
-                        onError={() => setError("Google sign-in failed")}/>
+                        onError={() => setError("Google sign-in failed")}
+                        theme="outline"
+                        size="small"
+                        shape="pill"/>
                                         
                 </div>
 
