@@ -13,6 +13,12 @@ interface Format{
       ext: string 
 };
 
+interface CanvasEditorProps {
+    loggedIn: boolean;
+    onLoginRequire: () => void;
+    canShare: boolean
+}
+
 interface CanvasProps{
      width: number;
      height: number;
@@ -24,7 +30,7 @@ interface CanvasProps{
      
 };
 
-interface CanvasWrapProps extends Omit<CanvasProps, "isErasing" | "color" | "lineWidth">{
+interface CanvasWrapProps extends Omit<CanvasProps, "isErasing" | "color" | "lineWidth">,CanvasEditorProps{
      wrapperRef: React.Ref<HTMLElement>;
      onResize: (w: number, h: number) => void;
 
@@ -40,9 +46,8 @@ interface ResizeProps extends Pick<CanvasWrapProps,"height" | "width" >{
      onResize: (w: number, h: number) => void;
 }
 
-interface ShareProps extends Pick<CanvasProps, "canvasRef">{
-    loggedIn: boolean;
-    onLoginRequire: () => void;
+interface ShareProps extends Pick<CanvasWrapProps, "canvasRef" | "loggedIn" | "onLoginRequire" | "canShare">{
+
 }
 
 const FORMATS: Format[] = [
@@ -54,7 +59,7 @@ const FORMATS: Format[] = [
 const MAX_UPLOAD = 10 * 1024 * 1024;
 
 
-function ShareMenu({ canvasRef, loggedIn, onLoginRequire }: ShareProps) {
+function ShareMenu({ canvasRef, loggedIn, canShare, onLoginRequire }: ShareProps) {
     const [open, setOpen] = useState<boolean>(false);
     const [title, setTitle] = useState<string>("");
     const [desc, setDesc] = useState<string>("");
@@ -79,10 +84,8 @@ function ShareMenu({ canvasRef, loggedIn, onLoginRequire }: ShareProps) {
     }, [open]);
 
     const toggle = () => {
-        if (!loggedIn) {            
-            onLoginRequire();
-            return;
-        }
+        if (!loggedIn) { onLoginRequire(); return; }
+        if (!canShare) { alert("Your account can't share yet."); return; }
         setMessage("");
         setOpen((o) => !o);
     };
@@ -91,7 +94,7 @@ function ShareMenu({ canvasRef, loggedIn, onLoginRequire }: ShareProps) {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        
+        // White background so transparent areas don't look black in the gallery
         const out = document.createElement("canvas");
         out.width = canvas.width;
         out.height = canvas.height;
@@ -117,11 +120,8 @@ function ShareMenu({ canvasRef, loggedIn, onLoginRequire }: ShareProps) {
 
                 const res = await api("/drawings", { method: "POST", body: form });
 
-                if (res.status === 401) {          
-                    setOpen(false);
-                    onLoginRequire();
-                    return;
-                }
+                if (res.status === 401) { setOpen(false); onLoginRequire(); return; }
+                if (res.status === 403) { setMessage("Your account isn't allowed to share."); return; }
                 if (!res.ok) { setMessage("Sharing failed. Try again."); return; }
 
                 setMessage("Shared! It now appears in Explore.");
@@ -137,19 +137,21 @@ function ShareMenu({ canvasRef, loggedIn, onLoginRequire }: ShareProps) {
 
     return (
         <div ref={menuRef} className="shareMenu">
-            <button onClick={toggle} title={loggedIn ? "" : "Log in to share"}>
-                Share ▾
-            </button>
+            <button onClick={toggle} title={loggedIn ? "" : "Log in to share"}>Share ▾</button>
 
             {open && (
                 <div className="resizePanel">
-                    <label htmlFor="shareTitle">Title</label><br />
+                    <label htmlFor="shareTitle">Title</label>
                     <input id="shareTitle" type="text" maxLength={100} value={title}
-                        onChange={(e) => setTitle(e.target.value)} placeholder="optional" /><br />
+                        onChange={(e) => setTitle(e.target.value)} placeholder="optional" />
 
-                    <label htmlFor="shareDesc">Description</label><br />
+                    <label htmlFor="shareDesc">Description</label>
                     <input id="shareDesc" type="text" maxLength={500} value={desc}
-                        onChange={(e) => setDesc(e.target.value)} placeholder="optional" /><br />
+                        onChange={(e) => setDesc(e.target.value)} placeholder="optional" />
+
+                    <span style={{ gridColumn: "1 / -1", fontSize: 12 }}>
+                        This will be visible to everyone.
+                    </span>
 
                     <button onClick={share} disabled={busy}>
                         {busy ? "Sharing..." : "Share publicly"}
@@ -363,7 +365,7 @@ function Canvas({width, height, color, canvasRef, zoom, isErasing, lineWidth }: 
     )
 }
     
-function CanvasWrapper({width, height, zoom, canvasRef, wrapperRef, onResize }: CanvasWrapProps){
+function CanvasWrapper({width, height, zoom, canvasRef, wrapperRef, loggedIn, canShare, onLoginRequire, onResize }: CanvasWrapProps){
         const  [isErasing, setIsErasing]= useState<boolean>(false);
         const [color, setColor] = useState<string>("#000000")
         const [lineWidth, setLineWidth] = useState<number>(3)
@@ -381,6 +383,7 @@ function CanvasWrapper({width, height, zoom, canvasRef, wrapperRef, onResize }: 
                     <input type="color" value={color} onChange={(e) => {setColor(e.target.value)}} />
                     <ResizeMenu width={width} height={height} onResize={onResize} />
                     <DownloadMenu canvasRef={canvasRef}/>
+                    <ShareMenu canvasRef={canvasRef} loggedIn={loggedIn} canShare={canShare} onLoginRequire={onLoginRequire} />
                 </section>
 
                 <section id="canvasWrapper" ref={wrapperRef}>
@@ -407,7 +410,7 @@ function SetupWindow({height, width, onSubmit, setHeight, setWidth}: SetupProps)
         )
 }
 
-export default function CanvasEditor(){
+export default function CanvasEditor({loggedIn, canShare, onLoginRequire}: CanvasEditorProps){
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const wrapperRef = useRef<HTMLElement>(null)
     const [width, setWidth] = useState<number>(1)
@@ -519,7 +522,7 @@ export default function CanvasEditor(){
 
             
             {popstate ? <SetupWindow height={height} width={width} onSubmit={() => {setDimension(true); setPopstate(false)}} setHeight={setHeight} setWidth={setWidth}/> :
-             dimension ? <CanvasWrapper width={width} height={height} zoom={zoom} canvasRef={canvasRef} wrapperRef={wrapperRef} onResize={resizeCanvas} /> :
+             dimension ? <CanvasWrapper width={width} height={height} zoom={zoom} canvasRef={canvasRef} wrapperRef={wrapperRef} onResize={resizeCanvas} loggedIn={loggedIn} canShare={canShare} onLoginRequire={onLoginRequire} /> :
               <><button onClick={() => setPopstate(true)}>Create</button>
             <button onClick={() => fileInputRef.current?.click()}>Open...</button> </> }
             

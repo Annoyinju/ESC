@@ -6,10 +6,14 @@ import  CanvasEditor from './assets/components/CanvasEditor.tsx'
 import Explore from './assets/components/Explore.tsx';
 import { api, type User } from "../src/api.tsx";
 import LoginWindow from './assets/components/LoginWindow.tsx';
+import About from './assets/components/About.tsx';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [showAuth, setShowAuth] = useState<boolean>(false);
+  const requireLogin = () => { setUser(null); setShowAuth(true); };
+  const canShare = !!user && user.role !== "USER_NOAUTH";
+
 
   useEffect(() => {
       api("/auth/profile")
@@ -54,9 +58,9 @@ function App() {
 
      <section className='content'>
       <Routes>
-        <Route path="/" element={<CanvasEditor />} />
+        <Route path="/" element={<About />} />
         <Route path="/explore" element={<Explore />} />
-        <Route path="/canvas" element={<CanvasEditor />} />
+        <Route path="/canvas" element={<CanvasEditor loggedIn={!!user} canShare={canShare} onLoginRequire={requireLogin}/>} />
       </Routes>
 
      </section>
