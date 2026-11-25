@@ -94,14 +94,17 @@ export default function LoginWindow({ onSuccess, onCancel }: LoginWindowProps) {
                     <input id="authPass" type="password" value={password}
                         onChange={(e) => setPassword(e.target.value)} /><br />
 
-                    <GoogleLogin
+                    
+                                        
+                </div>
+
+                <GoogleLogin
                         onSuccess={(r) => r.credential && googleSignIn(r.credential)}
                         onError={() => setError("Google sign-in failed")}
                         theme="outline"
                         size="small"
-                        shape="pill"/>
-                                        
-                </div>
+                        shape="pill"
+                        />
 
                 {error && <p style={{ color: "#c0392b", margin: "0 16px 10px" }}>{error}</p>}
 
