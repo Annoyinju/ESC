@@ -1,5 +1,5 @@
 
-import { Routes, Route, Link, HashRouter } from 'react-router-dom';
+import { Routes, Route, NavLink, HashRouter } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import './App.css'
 import  CanvasEditor from './assets/components/CanvasEditor.tsx'
@@ -32,12 +32,12 @@ function App() {
     <header>
       {user ? (
       <>
-      <div>Zalogowano Jako: {user.username}</div>
-      <button onClick={logout}>Wyloguj</button>
+      <div>Logged in as: {user.username}</div>
+      <button onClick={logout}>Sign out</button>
       </>  
       ): (
       <>
-      <button onClick={() => {setShowAuth(true)}}>Zaloguj</button>
+      <button onClick={() => {setShowAuth(true)}}>Sign in</button>
       </>)}
     </header>
     {showAuth && (
@@ -49,9 +49,9 @@ function App() {
     <section className='main'>
      <section className='side'>
       <nav>
-        <Link to="/">Home</Link>
-        <Link to="/explore">Explore</Link>
-        <Link to="/canvas">Create</Link>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/explore">Explore</NavLink>
+        <NavLink to="/canvas">Create</NavLink>
       </nav>
       
      </section>
