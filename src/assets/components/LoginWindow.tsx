@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api, type User } from "../../api";
+import { GoogleLogin } from "@react-oauth/google";
 
 interface LoginWindowProps {
     onSuccess: (user: User) => void;
@@ -13,6 +14,27 @@ export default function LoginWindow({ onSuccess, onCancel }: LoginWindowProps) {
     const [password, setPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
     const [busy, setBusy] = useState<boolean>(false);
+
+
+    const googleSignIn = async (credential: string) => {
+        setError("");
+        try {
+            const res = await api("/auth/google", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ credential }),
+            });
+            const data = await res.json().catch(() => null);
+            if (!res.ok) {
+                setError(typeof data?.error === "string" ? data.error : "Google sign-in failed");
+                return;
+            }
+            onSuccess(data);
+        } catch {
+            setError("Could not reach the server");
+        }
+    };
+
 
     const submit = async () => {
         setError("");
@@ -70,8 +92,12 @@ export default function LoginWindow({ onSuccess, onCancel }: LoginWindowProps) {
                     
                     <label htmlFor="authPass">Password:</label><br />
                     <input id="authPass" type="password" value={password}
-                        onChange={(e) => setPassword(e.target.value)} />
-                    
+                        onChange={(e) => setPassword(e.target.value)} /><br />
+
+                    <GoogleLogin
+                        onSuccess={(r) => r.credential && googleSignIn(r.credential)}
+                        onError={() => setError("Google sign-in failed")}/>
+                                        
                 </div>
 
                 {error && <p style={{ color: "#c0392b", margin: "0 16px 10px" }}>{error}</p>}

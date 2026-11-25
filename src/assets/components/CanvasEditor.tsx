@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { Eraser } from "lucide-react";
+import { api } from "../../api";
 
 interface Point{ 
      x: number;
@@ -39,11 +40,127 @@ interface ResizeProps extends Pick<CanvasWrapProps,"height" | "width" >{
      onResize: (w: number, h: number) => void;
 }
 
+interface ShareProps extends Pick<CanvasProps, "canvasRef">{
+    loggedIn: boolean;
+    onLoginRequire: () => void;
+}
+
 const FORMATS: Format[] = [
     { label: "PNG",  mime: "image/png",  ext: "png" },
     { label: "JPEG", mime: "image/jpeg", ext: "jpg" },
     { label: "WebP", mime: "image/webp", ext: "webp" },
 ];
+
+const MAX_UPLOAD = 10 * 1024 * 1024;
+
+
+function ShareMenu({ canvasRef, loggedIn, onLoginRequire }: ShareProps) {
+    const [open, setOpen] = useState<boolean>(false);
+    const [title, setTitle] = useState<string>("");
+    const [desc, setDesc] = useState<string>("");
+    const [busy, setBusy] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>("");
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!open) return;
+        const onPointerDown = (e: PointerEvent) => {
+            if (!menuRef.current?.contains(e.target as Node)) setOpen(false);
+        };
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setOpen(false);
+        };
+        document.addEventListener("pointerdown", onPointerDown);
+        document.addEventListener("keydown", onKeyDown);
+        return () => {
+            document.removeEventListener("pointerdown", onPointerDown);
+            document.removeEventListener("keydown", onKeyDown);
+        };
+    }, [open]);
+
+    const toggle = () => {
+        if (!loggedIn) {            
+            onLoginRequire();
+            return;
+        }
+        setMessage("");
+        setOpen((o) => !o);
+    };
+
+    const share = () => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        
+        const out = document.createElement("canvas");
+        out.width = canvas.width;
+        out.height = canvas.height;
+        const ctx = out.getContext("2d");
+        if (!ctx) return;
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, out.width, out.height);
+        ctx.drawImage(canvas, 0, 0);
+
+        setBusy(true);
+        setMessage("");
+
+        out.toBlob(async (blob) => {
+            try {
+                if (!blob) { setMessage("Could not export the canvas."); return; }
+                if (blob.size > MAX_UPLOAD) { setMessage("Image is over 10 MB. Resize it first."); return; }
+
+                const form = new FormData();
+                form.append("image", blob, "drawing.png");
+                form.append("isPublic", "true");
+                if (title.trim()) form.append("title", title.trim());
+                if (desc.trim()) form.append("desc", desc.trim());
+
+                const res = await api("/drawings", { method: "POST", body: form });
+
+                if (res.status === 401) {          
+                    setOpen(false);
+                    onLoginRequire();
+                    return;
+                }
+                if (!res.ok) { setMessage("Sharing failed. Try again."); return; }
+
+                setMessage("Shared! It now appears in Explore.");
+                setTitle("");
+                setDesc("");
+            } catch {
+                setMessage("Could not reach the server.");
+            } finally {
+                setBusy(false);
+            }
+        }, "image/png");
+    };
+
+    return (
+        <div ref={menuRef} className="shareMenu">
+            <button onClick={toggle} title={loggedIn ? "" : "Log in to share"}>
+                Share ▾
+            </button>
+
+            {open && (
+                <div className="resizePanel">
+                    <label htmlFor="shareTitle">Title</label><br />
+                    <input id="shareTitle" type="text" maxLength={100} value={title}
+                        onChange={(e) => setTitle(e.target.value)} placeholder="optional" /><br />
+
+                    <label htmlFor="shareDesc">Description</label><br />
+                    <input id="shareDesc" type="text" maxLength={500} value={desc}
+                        onChange={(e) => setDesc(e.target.value)} placeholder="optional" /><br />
+
+                    <button onClick={share} disabled={busy}>
+                        {busy ? "Sharing..." : "Share publicly"}
+                    </button>
+
+                    {message && <span style={{ gridColumn: "1 / -1" }}>{message}</span>}
+                </div>
+            )}
+        </div>
+    );
+}
 
 function DownloadMenu({canvasRef}: Pick<CanvasProps, "canvasRef">) {
     const [open, setOpen] = useState<boolean>(false);
@@ -398,7 +515,7 @@ export default function CanvasEditor(){
             />
 
 
-            <input type="number" name="" id="" onChange={(e) => {console.log(e.target.valueAsNumber)}} />
+            
 
             
             {popstate ? <SetupWindow height={height} width={width} onSubmit={() => {setDimension(true); setPopstate(false)}} setHeight={setHeight} setWidth={setWidth}/> :
