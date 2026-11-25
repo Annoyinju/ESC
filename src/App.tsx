@@ -59,7 +59,7 @@ function App() {
      <section className='content'>
       <Routes>
         <Route path="/" element={<About />} />
-        <Route path="/explore" element={<Explore />} />
+        <Route path="/explore" element={<Explore isAdmin={user?.role === "ADMIN"} loggedIn={!!user} />} />
         <Route path="/canvas" element={<CanvasEditor loggedIn={!!user} canShare={canShare} onLoginRequire={requireLogin}/>} />
       </Routes>
 
