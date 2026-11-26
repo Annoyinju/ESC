@@ -40,6 +40,7 @@ interface SetupProps extends Pick<CanvasWrapProps,"height" | "width" >{
      setHeight: (n: number) => void;
      setWidth: (n: number) => void;
      onSubmit: () => void;
+     onCancel: () => void;
 }
 
 interface ResizeProps extends Pick<CanvasWrapProps,"height" | "width" >{
@@ -393,20 +394,56 @@ function CanvasWrapper({width, height, zoom, canvasRef, wrapperRef, loggedIn, ca
         )
 }
 
-function SetupWindow({height, width, onSubmit, setHeight, setWidth}: SetupProps) {
+function SetupWindow({height, width, onSubmit, setHeight, setWidth, onCancel}: SetupProps) {
     
        
         return (
-            <section className="popup">
+            <div className="popupBackdrop">
+            <section className="popup" role="dialog">
+                <header className="popupTitleBar">
+                    <span>Set Dimensions</span>
+                    <button className="popupClose" onClick={onCancel} aria-label="Close">✕</button>
+                </header>
+
+               
+
+
+                <div className="popupBody">
+
+                     
+                    <label htmlFor="inHeight">Height: </label>
+                    <input type="number" name="inHeight" value={height}
+                    onChange={(e) => {setHeight!(e.target.valueAsNumber <= Number(e.target.max) || Number.isNaN(e.target.valueAsNumber) ? e.target.valueAsNumber : Number(e.target.max))}}
+                    id="inHeight" min="1" max="4096"/><br />
+                    
+
+                    
+                    <label htmlFor="inWidth"> Width: </label>
+                <input type="number" name="inWidth" value={width}
+                 onChange={(e) => {setWidth!((e.target.valueAsNumber <= Number(e.target.max) || Number.isNaN(e.target.valueAsNumber)) ? e.target.valueAsNumber : Number(e.target.max))}} 
+                 id="inWidth" min="1" max="4096"/><br />
+
+                    
+                                        
+                </div>
                 
 
-                <label htmlFor="inHeight">Height: </label>
-                <input type="number" name="inHeight" value={height} onChange={(e) => {setHeight!(e.target.valueAsNumber <= Number(e.target.max) || Number.isNaN(e.target.valueAsNumber) ? e.target.valueAsNumber : Number(e.target.max))}} id="inHeight" min="1" max="4096"/>
-                <label htmlFor="inWidth"> Width: </label>
-                <input type="number" name="inWidth" value={width} onChange={(e) => {setWidth!((e.target.valueAsNumber <= Number(e.target.max) || Number.isNaN(e.target.valueAsNumber)) ? e.target.valueAsNumber : Number(e.target.max))}} id="inWidth" min="1" max="4096"/>
-                <br />
-                <button onClick={onSubmit}>Submit</button>
+               
+
+                <footer className="popupFooter">
+                    
+                    <button onClick={onSubmit}>Set</button>
+                </footer>
             </section>
+        </div>
+            // <section className="popup">
+                
+
+               
+                
+                
+                 
+            // </section>
         )
 }
 
@@ -521,7 +558,7 @@ export default function CanvasEditor({loggedIn, canShare, onLoginRequire}: Canva
             
 
             
-            {popstate ? <SetupWindow height={height} width={width} onSubmit={() => {setDimension(true); setPopstate(false)}} setHeight={setHeight} setWidth={setWidth}/> :
+            {popstate ? <SetupWindow height={height} width={width} onSubmit={() => {setDimension(true); setPopstate(false)}} setHeight={setHeight} setWidth={setWidth} onCancel={() => {setPopstate(false)}}/> :
              dimension ? <CanvasWrapper width={width} height={height} zoom={zoom} canvasRef={canvasRef} wrapperRef={wrapperRef} onResize={resizeCanvas} loggedIn={loggedIn} canShare={canShare} onLoginRequire={onLoginRequire} /> :
               <><button onClick={() => setPopstate(true)}>Create</button>
             <button onClick={() => fileInputRef.current?.click()}>Open...</button> </> }

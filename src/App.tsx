@@ -7,6 +7,7 @@ import Explore from './assets/components/Explore.tsx';
 import { api, type User } from "../src/api.tsx";
 import LoginWindow from './assets/components/LoginWindow.tsx';
 import About from './assets/components/About.tsx';
+import Profile from './assets/components/Profile.tsx';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -52,6 +53,7 @@ function App() {
         <NavLink to="/">Home</NavLink>
         <NavLink to="/explore">Explore</NavLink>
         <NavLink to="/canvas">Create</NavLink>
+        <NavLink to="/profile">Profile</NavLink>
       </nav>
       
      </section>
@@ -61,6 +63,10 @@ function App() {
         <Route path="/" element={<About />} />
         <Route path="/explore" element={<Explore isAdmin={user?.role === "ADMIN"} loggedIn={!!user} />} />
         <Route path="/canvas" element={<CanvasEditor loggedIn={!!user} canShare={canShare} onLoginRequire={requireLogin}/>} />
+        <Route
+    path="/profile"
+    element={<Profile loggedIn={!!user} onLoginRequire={() => setShowAuth(true)} onUserChange={setUser} />}
+/>
       </Routes>
 
      </section>

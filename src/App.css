@@ -243,7 +243,7 @@ canvas {
 .side nav a {
     padding: 8px 14px;
     border-radius: 6px;
-    border-left: 3px solid transparent;   /* reserves space so nothing shifts when active */
+    border-left: 3px solid transparent;   
     color: inherit;
     text-decoration: none;
     transition: background 0.15s, border-color 0.15s;
@@ -257,4 +257,26 @@ canvas {
     background: rgba(74, 111, 165, 0.2);
     border-left-color: #4a6fa5;
     font-weight: 600;
+}
+
+.profilePage { display: flex; flex-direction: column; gap: 16px; max-width: 900px; }
+
+.profileCard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+    border: 1px solid rgba(128, 128, 128, 0.4);
+    border-radius: 8px;
+}
+.profileCard input, .profileCard select { padding: 6px 8px; }
+.profileCard button { align-self: flex-start; }
+.profileError { color: #c0392b; }
+
+.adminTableWrap { overflow-x: auto; }
+.adminTable { width: 100%; border-collapse: collapse; }
+.adminTable th, .adminTable td {
+    padding: 6px 8px;
+    text-align: left;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.3);
 }
